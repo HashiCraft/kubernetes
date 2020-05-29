@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minecraft-deployment
+  labels:
+    app: minecraft
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: minecraft
+  template:
+    metadata:
+      labels:
+        app: minecraft
+    spec:
+      containers:
+      - name: minecraft
+        image: hashicraft/minecraft:v1.12.2
+        ports:
+        - containerPort: 25565
+        env:
+        - name: WORLD_BACKUP
+          value: https://github.com/nicholasjackson/hashicraft/releases/download/v0.0.0/world2.tar.gz
+        - name: WHITELIST_ENABLED
+          value: "false"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: minecraft
+  name: minecraft
+spec:
+  ports:
+  - name: minecraft
+    nodePort: 30001
+    port: 25565
+    protocol: TCP
+    targetPort: 25565
+  selector:
+    app: minecraft
+  type: NodePort
